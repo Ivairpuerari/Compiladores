@@ -4,5 +4,8 @@ Desenvolvido em Python.
 
 
 Comando p/Compilar:
-    - python EtapaA.py
-    - python EtapaAB.py
+   
+   
+   - python EtapaA.py
+    
+   - python EtapaAB.py
