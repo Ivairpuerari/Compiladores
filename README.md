@@ -4,4 +4,5 @@ Desenvolvido em Python.
 
 
 Comando p/Compilar:
-    - python lexica.py
+    - python EtapaA.py
+    - python EtapaAB.py
