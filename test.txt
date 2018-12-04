@@ -1,9 +1,9 @@
-var galinha = 0
-var cachorro =  5
-var dinossauro = galinha * cachorro
-while ( dinossauro < 12 ) then
-    if dinossauro then
-    begin
-        print ( corre ) 
-    end
+begin
+	a = 10 
+	if a < 100 then
+		a = a + 1
+
+	else
+		while a > 100
+			break
 end

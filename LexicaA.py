@@ -4,15 +4,15 @@ Análsie léxica
 Alunos: Ivair Puerari
         Jeferson Schein
 """
-
+from Afnd import determinizeAFND
 
 class Lexical:
-    def __init__(self, pAutomaton, pSymbol):
+    def __init__(self, ptokens):
         self.tableOfSymbol = []
-        self.afnd = pAutomaton
+        self.afnd = determinizeAFND(ptokens)
         self.tape = [] #Fita
-        self.terminals = pSymbol
         self.recurrentLine = None
+        self.done = True
     
     def lexicalAnalysis(self,pFile):
         log = []
@@ -25,58 +25,56 @@ class Lexical:
                     state = 0
                     error = 0
                     for position in symbol:
-
-                        newState = self.verifySymbol(position,state,symbol)
-                        if(newState > max(self.afnd.keys())):
+                        if self.afnd.HaveNoSymbolYet(position):
                             if(state > 0):
                                 error = 1
                             break
                         else:
-                            state = newState
+                            state = self.getState(position,state)
                             
                     if(self.isStateFinal(state) and self.HaveNoErrors(error)):
                         self.setTableOfSymbol([symbol,state,NumberOfline])
+                        self.setTape([symbol,state])
                     else:
-                        error = 1
-
-                    if(not self.HaveNoErrors(error)):    
-                        self.setTableOfSymbol([symbol,max(self.afnd.keys()),NumberOfline])
+                        self.setTableOfSymbol([symbol,max(self.afnd.automaton.keys()),NumberOfline])
+                        self.setTape([symbol,max(self.afnd.automaton.keys())])
                         log.append("\nErro Léxico! >> Token:"+ symbol + " Linha : "+str(NumberOfline))
 
             NumberOfline += 1 
         
-        return self.infoLog(log)                    
-    
-    def verifySymbol(self, pPosition, pState, pSymbol):
-        for state in range(0,len(self.afnd[pState])):
-            newState = self.afnd[pState][state].split(":")
-            if(pPosition in newState[0]):
-                newState = int(newState[1])
-                return newState
-        return max(self.afnd.keys())+1
-    
+        self.infoLog(log)                    
+
     def removeAndSplitLine(self):
         self.recurrentLine = self.recurrentLine.strip().split()
+    def setTape(self,pValue):
+        self.tape.append(pValue)
+
 
     def infoLog(self,pLog):
-        if(len(pLog) > 0):
-            for line in pLog:
-                print(line + '\n')
-            return False
-        else:
-            print('\nNenhum erro léxico!\n')
-            return True
+        self.Show(pLog) if len(pLog) > 0 else print("\nNenhum erro léxico!\n")
+    def Show(self,pLog):
+        self.done = False
+        for line in pLog:
+            print(line + '\n')
             
     def setTableOfSymbol(self,pValue):
         self.tableOfSymbol.append(pValue)
     
     def isStateFinal(self, pState):
-        return (pState in self.terminals.keys())  
+        return (pState in self.afnd.FinalStates)  
     
     def HaveNoErrors(self,pError):
         return (pError == 0)  
     
+    def getState(self,pPosition,pState):
+        index = self.afnd.symbols.index(ord(pPosition))
+        return self.afnd.automaton[pState][index]
+    
     def isNotLineEmpty(self):
-        return (self.recurrentLine != '')   
+        return (self.recurrentLine != '')             
 
-         
+if __name__ == '__main__':	
+	lex = Lexical("tokens.txt")
+	lex.lexicalAnalysis("test.txt")
+	print(lex.tape)
+	print('\n',lex.tableOfSymbol)
